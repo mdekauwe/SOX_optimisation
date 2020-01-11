@@ -41,7 +41,8 @@ class CollatzC3(object):
                  Ec=79430.0, Eo=36380.0, theta_hyperbol=0.9995,
                  quantum_yield=0.3, absorptance=0.8, gs_model=None, gamma=0.0,
                  Eav=60000.0, deltaSj=650.0, deltaSv=650.0, Hdv=200000.0,
-                 Q10_Kc=2.1, Q10_Ko=1.2, Q10=2.0, Tlower=10.0, Tupper=50.0):
+                 Q10_Kc=2.1, Q10_Ko=1.2, Q10_Vcmax=2.0, Tlower=10.0,
+                 Tupper=50.0):
 
 
         self.Oi = Oi
@@ -52,9 +53,9 @@ class CollatzC3(object):
         self.Hdv = Hdv
         self.Q10_Ko = Q10_Ko
         self.Q10_Kc = Q10_Kc
-        self.Q10 = Q10
-        self.Tlower = Tlower
-        self.Tupper = Tupper
+        self.Q10_vcmax = Q10_Vcmax # Q10 value for carboxylation of Rubisco
+        self.Tlower = Tlower # Lower temperature for carboxylation
+        self.Tupper = Tupper # Upper temperature for carboxylation
 
 
     def calc_photosynthesis(self, Cs=None, Tleaf=None, Par=None, Vcmax25=None):
@@ -89,7 +90,7 @@ class CollatzC3(object):
         """
         Q10 function to calculate parameter change with temperature
         """
-        
+
         return k25 * (Q10**((Tleaf - 25.0) / 10.0))
 
     def correct_vcmax_for_temperature(self, Vcmax25, Tleaf):
@@ -97,7 +98,7 @@ class CollatzC3(object):
         Correct Vcmax based on defined by PFT-specific upper and lower
         temperature params, see Clark et al. (mol CO2 m-2 s-1)
         """
-        num = self.Q10_func(Vcmax25, self.Q10, Tleaf)
+        num = self.Q10_func(Vcmax25, self.Q10_Vcmax, Tleaf)
         den = (1.0 + math.exp(0.3 * (Tleaf - self.Tupper))) * \
                 (1.0 + math.exp(0.3 * (self.Tlower - Tleaf)))
 
