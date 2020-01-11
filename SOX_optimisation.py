@@ -54,6 +54,10 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     dA_dci = dA / (dCi / press)
 
     # Calculate dK
+    # The dK is computed as the linear gradient between K_pd and
+    # K((psi_pd+p50)/2), see supplementary...this isn't in the main manuscript.
+    # They use p50 as they argue this represents the steepest point of the
+    # vulnerability func K(psi_m).
     K_pd = calc_xylem_hydraulic_conduc(psi_pd, p50, a_vuln)
     psi_mid = (psi_pd + p50) / 2.0
     K_psi_mid = calc_xylem_hydraulic_conduc(psi_mid, p50, a_vuln)
