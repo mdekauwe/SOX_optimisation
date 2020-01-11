@@ -59,12 +59,15 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     V2 = calc_xylem_hydraulic_conduc(psi_mid, p50, a_vuln)
     dV = V1 - V2
 
-    dV_dLWP_V = (dV / (psi_pd - psi_mid)) * (1.0 / V1)
+    dV_dLWP = dV / (psi_pd - psi_mid)
 
-    # Calculate xi
-    rp_d = c.GSVGSC * (rp_min / V1) * dq / 2.0
-    xi = 1.0 / (rp_d * dV_dLWP_V)
+    # plant hydraulic resistance
+    rp = rp_min / V1
 
+    # Calculate xi, the cost of stomatal opening in terms of loss of xylem
+    # conductivity under low Ψpd and/or higher leaf-to-air vapour pressure
+    xi = 2.0 / ( (1.0 / V1) * dV_dLWP * rp * c.GSVGSC * dq)
+    
     # Calculate gs at the colimitation point
     gs_col = (A2 * press / (Cs - Ci_col)) * c.GSVGSC
 
