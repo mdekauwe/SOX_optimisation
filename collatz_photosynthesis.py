@@ -37,19 +37,21 @@ class CollatzC3(object):
     """
     # Note in Clark et al. Ko25=30.0*1E4, using 1E3 to match Eller, check if
     # that is a mistake
-    def __init__(self, Oi=210.0, gamstar25=42.75, Kc25=30.0, Ko25=30.0*1E3,
+    def __init__(self, Oa=21000.0, gamstar25=42.75, Kc25=30.0, Ko25=30.0*1E3,
                  Q10_Kc=2.1, Q10_Ko=1.2, Q10_Vcmax=2.0, Tlower=10.0,
-                 Tupper=50.0):
+                 Tupper=50.0, gamma25=2600.0, Q10_gamma=0.57):
 
-
+        self.gamma25 = gamma25 #
         self.Kc25 = Kc25 # MM coefficents for carboxylation by Rubisco (Pa)
         self.Ko25 = Ko25 # MM coefficents for oxygenation by Rubisco (Pa)
         self.Q10_Ko = Q10_Ko # Q10 value for MM constants for O2
         self.Q10_Kc = Q10_Kc # Q10 value for MM constants for CO2
         self.Q10_Vcmax = Q10_Vcmax # Q10 value for carboxylation of Rubisco
+        self.Q10_gamma = Q10_gamma # Q10 value for Rubisco specificity for CO2
+                                   # relative to O2
         self.Tlower = Tlower # Lower temperature for carboxylation
         self.Tupper = Tupper # Upper temperature for carboxylation
-
+        self.Oa = Oa # the partial pressure of atmospheric oxygen (Pa)
 
     def calc_photosynthesis(self, Cs=None, Tleaf=None, Par=None, Vcmax25=None):
         """
@@ -76,8 +78,22 @@ class CollatzC3(object):
         # Michaelis Menten constants for O2 (Pa)
         Ko = self.Q10_func(self.Ko25, self.Q10_Ko, Tleaf)
 
-        print(Vcmax, Kc, Ko)
+        # CO2 compensation point in the absence of mitochondrial resp (Pa)
+        gamma = self.calc_CO2_compensation_point(Tleaf)
 
+        print(Vcmax, Kc, Ko, gamma)
+
+
+    def calc_CO2_compensation_point(self, Tleaf):
+        """
+        Photorespiration compensation point (Pa)
+        """
+
+        # Rubisco specificity for CO2 relative to O2
+        tau = self.Q10_func(self.gamma25, self.Q10_gamma, Tleaf)
+        gamma = self.Oa / (2.0 * tau)
+
+        return gamma
 
     def Q10_func(self, k25, Q10, Tleaf):
         """
