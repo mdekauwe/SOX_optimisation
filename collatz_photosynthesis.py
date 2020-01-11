@@ -51,8 +51,8 @@ class CollatzC3(object):
         self.Eav = Eav
         self.deltaSv = deltaSv
         self.Hdv = Hdv
-        self.Q10_Ko = Q10_Ko
-        self.Q10_Kc = Q10_Kc
+        self.Q10_Ko = Q10_Ko # Q10 value for MM constants for O2
+        self.Q10_Kc = Q10_Kc # Q10 value for MM constants for CO2
         self.Q10_Vcmax = Q10_Vcmax # Q10 value for carboxylation of Rubisco
         self.Tlower = Tlower # Lower temperature for carboxylation
         self.Tupper = Tupper # Upper temperature for carboxylation
