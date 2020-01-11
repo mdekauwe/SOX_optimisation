@@ -46,9 +46,9 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     dCi = Cs - Ci_col
 
     # Calculate dA
-    A1 = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
-    A2 = C.calc_photosynthesis(Ci_col, Tleaf, PAR, Vcmax25)
-    dA = A1 - A2
+    A_Cs = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
+    A_col = C.calc_photosynthesis(Ci_col, Tleaf, PAR, Vcmax25)
+    dA = A_Cs - A_col
 
     # Calculate dA/dCi
     dA_dci = dA / (dCi / press)
@@ -78,7 +78,7 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     xi = 2.0 / ( (1.0 / K_pd) * dK_dpsi_leaf * rp * c.GSVGSC * dq)
 
     # Calculate gs at the colimitation point
-    gs_col = (A2 * press / (Cs - Ci_col)) * c.GSVGSC
+    gs_col = (A_col * press / (Cs - Ci_col)) * c.GSVGSC
 
     # Calculate gs (mol H2O m-2 s-1)
     if dA_dci <= 0.0:
