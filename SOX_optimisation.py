@@ -40,6 +40,10 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
                      rp_min, dq, LAI, k=0.5):
 
     C = CollatzC3()
+
+    # Calculate Ci at the co-limation point, i.e. the point where increasing
+    # Ci won't lead to an increase in A because A would become light (Al) or
+    # transport limited (Ae) 
     Ci_col = C.calc_ci_at_colimitation_point(Cs, Tleaf, PAR, Vcmax25)
 
     # Calculate dCi
