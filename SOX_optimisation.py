@@ -95,6 +95,19 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
 
 
 def cavitation_func(P, P50, a):
+    """
+    Inverse polynomial function to describe cavitation-induced embolism
+
+    Reference:
+    ---------
+    * Manzoni S et al. (2013) Hydraulic limits on maximum plant transpiration and
+      the emergence of the safety – efficiency trade-off. New Phytol. 198,
+      169-178.
+    * Christoffersen BO et al. (2016) Linking hydraulic traits to tropical
+      forest function in a size-structured and trait-driven model
+      (TFS v.1-Hydro). Geosci. Model Dev. 9, 4227-4255.
+
+    """
     return 1.0 / (1.0 + (P / P50)**a)
 
 
