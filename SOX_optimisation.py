@@ -3,8 +3,8 @@
 """
 Stomatal optimisation based on xylem hydraulics (SOX) model.
 
-SOX hypothesis: gs that gives the maximum o the product of leaf photosynthesis
-and the xylem hydraulic conductance.
+SOX hypothesis: find the gs maximises the product of leaf photosynthesis
+and the xylem hydraulic conductance, i.e. dA.K / dgs = 0
 
 References
 ==========
