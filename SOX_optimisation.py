@@ -42,15 +42,17 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     C = CollatzC3()
     Ci_col = C.calc_ci_at_colimitation_point(Cs, Tleaf, PAR, Vcmax25)
 
-    # Calculate dA/dCi
+    # Calculate dCi
     Ci1 = Cs
     Ci2 = Ci_col
     dCi = Ci1 - Ci2
 
+    # Calculate dA
     A1 = C.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
     A2 = C.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
     dA = A1 - A2
 
+    # Calculate dA/dCi
     dA_dci = dA / (dCi / press)
 
     # Calculate dV/dLWP numerically
