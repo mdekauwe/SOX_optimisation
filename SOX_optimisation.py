@@ -32,7 +32,7 @@ def main(Vcmax25, Tleaf, Cs, PAR):
     Ci = Cs * 0.7
 
     C = CollatzC3()
-    
+
     Ci_col = C.calc_ci_at_colimitation_point(Ci, Tleaf, PAR, Vcmax25)
 
     print(Ci_col)

@@ -40,7 +40,7 @@ class CollatzC3(object):
     def __init__(self, Oa=21000.0, gamstar25=42.75, Kc25=30.0, Ko25=30.0*1E3,
                  Q10_Kc=2.1, Q10_Ko=1.2, Q10_Vcmax=2.0, Tlower=10.0,
                  Tupper=50.0, gamma25=2600.0, Q10_gamma=0.57, alpha=0.08,
-                 omega=0.15, beta1=0.999, beta2=0.999):
+                 omega=0.15, beta1=0.83, beta2=0.93):
 
         self.gamma25 = gamma25 # coefficents for CO2 compensation point (Pa)
         self.Kc25 = Kc25 # MM coefficents for carboxylation by Rubisco (Pa)
