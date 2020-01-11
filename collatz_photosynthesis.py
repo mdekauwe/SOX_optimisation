@@ -29,6 +29,10 @@ class CollatzC3(object):
       Physiological and environmental regulation of stomatal conductance,
       photosynthesis and transpiration: amodel that includes alaminar boundary
       layer, Agr. Forest Meteorol., 54, 107–136.
+    * Clark DB, Mercado LM, Sitch S, Jones CD, Gedney N, Best MJ, Pryor M,
+      Rooney GG, Essery RLH, Blyth E, et al. 2011. The Joint UK Land
+      Environment Simulator (JULES), Model description – Part 2: Carbon fluxes
+      and vegetation. Geoscientific Model Development Discussions 4: 641–688.
 
     """
     # Note in Clark et al. Ko25=30.0*1E4, using 1E3 to match Eller, check if
