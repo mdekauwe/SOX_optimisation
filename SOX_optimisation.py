@@ -75,28 +75,30 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
         gs = (0.5 * dA_dci * (np.sqrt(1.0 + 4.0 * xi / dA_dci) - 1.0))
         gs *= c.GSVGSC
 
-    # Infer transpiration, assuming perfect coupling
+    # Infer transpiration, assuming perfect coupling (mol H2O m-2 leaf s-1)
     E = dq * gs
 
-    # Infer psi_leaf
+    # Infer psi_leaf (MPa)
     psi_leaf = psi_pd - (rp_min / V1) * E
 
     # Infer rp
     V = calc_xylem_hydraulic_conduc( (psi_pd + psi_leaf) / 2.0, p50, a_vuln)
     rp = rp_min / V
 
-    # Infer An (mol CO2 m-2 s-1)
+    # Infer An (mol CO2 m-2 leaf s-1)
     gc = gs / c.GSVGSC
     An = C.calc_photosynthesis_given_gc(Cs, Tleaf, PAR, Vcmax25, gc, press)
 
-    # Diagnose Ci
+    # Diagnose Ci  (Pa)
     Ci = Cs - (An * press) / gc
 
-    # Scale A and E up to the canopy using a big-leaf approximation
+    # Scale A (g C m-2 d-1) and E (mm d-1) up to the canopy using a
+    # big-leaf approximation
     GPP = An * (1.0 - np.exp(-k * LAI)) / k
     GPP *= c.MOL_C_TO_GRAMS_C * c.SEC_TO_DAY
-
     E *= (1.0 - np.exp(-k * LAI)) / k
+    E *= c.MOL_WATER_2_G_WATER * c.G_TO_KG * c.SEC_TO_DAY
+
 
     return (gs, GPP, E, Ci, rp)
 
