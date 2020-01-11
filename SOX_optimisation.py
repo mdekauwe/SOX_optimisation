@@ -94,9 +94,19 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     return (gs, GPP, E, Ci, rp)
 
 
-def cavitation_func(P, P50, a):
+def cavitation_func(psi, p50, a):
     """
     Inverse polynomial function to describe cavitation-induced embolism
+
+    Parameters:
+    ----------
+    psi : float
+        water potential (MPa)
+    p50 : float
+        xylem pressure inducing 50% loss of hydraulic
+        conductivity due to embolism (MPa)
+    a : float
+        shape of the vulnerability curve (unitless)
 
     Reference:
     ---------
@@ -108,7 +118,7 @@ def cavitation_func(P, P50, a):
       (TFS v.1-Hydro). Geosci. Model Dev. 9, 4227-4255.
 
     """
-    return 1.0 / (1.0 + (P / P50)**a)
+    return 1.0 / (1.0 + (psi / p50)**a)
 
 
 if __name__ == "__main__":
