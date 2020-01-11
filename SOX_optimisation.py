@@ -188,5 +188,6 @@ if __name__ == "__main__":
                                                 rp_min, dq, LAI)
         gs_store.append(gs)
 
-    plt.plot(Cs, gs_store)
+    Cs_umol_mol = Cs / press * c.MOL_TO_UMOL
+    plt.plot(Cs_umol_mol, gs_store)
     plt.show()
