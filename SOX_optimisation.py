@@ -36,11 +36,8 @@ import constants as c
 def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
                      rp_min, dq, LAI, k=0.5):
 
-    Ci = Cs * 0.7
-
     COL = CollatzC3()
-
-    Ci_col = COL.calc_ci_at_colimitation_point(Ci, Tleaf, PAR, Vcmax25)
+    Ci_col = COL.calc_ci_at_colimitation_point(Cs, Tleaf, PAR, Vcmax25)
 
     # Calculate dA/dCi
     Ci1 = Cs
