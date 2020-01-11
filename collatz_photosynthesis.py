@@ -38,19 +38,12 @@ class CollatzC3(object):
     # Note in Clark et al. Ko25=30.0*1E4, using 1E3 to match Eller, check if
     # that is a mistake
     def __init__(self, Oi=210.0, gamstar25=42.75, Kc25=30.0, Ko25=30.0*1E3,
-                 Ec=79430.0, Eo=36380.0, theta_hyperbol=0.9995,
-                 quantum_yield=0.3, absorptance=0.8, gs_model=None, gamma=0.0,
-                 Eav=60000.0, deltaSj=650.0, deltaSv=650.0, Hdv=200000.0,
                  Q10_Kc=2.1, Q10_Ko=1.2, Q10_Vcmax=2.0, Tlower=10.0,
                  Tupper=50.0):
 
 
-        self.Oi = Oi
-        self.Kc25 = Kc25 # Pa
-        self.Ko25 = Ko25 # Pa
-        self.Eav = Eav
-        self.deltaSv = deltaSv
-        self.Hdv = Hdv
+        self.Kc25 = Kc25 # MM coefficents for carboxylation by Rubisco (Pa)
+        self.Ko25 = Ko25 # MM coefficents for oxygenation by Rubisco (Pa)
         self.Q10_Ko = Q10_Ko # Q10 value for MM constants for O2
         self.Q10_Kc = Q10_Kc # Q10 value for MM constants for CO2
         self.Q10_Vcmax = Q10_Vcmax # Q10 value for carboxylation of Rubisco
