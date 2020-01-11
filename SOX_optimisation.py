@@ -43,14 +43,11 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     Ci_col = C.calc_ci_at_colimitation_point(Cs, Tleaf, PAR, Vcmax25)
 
     # Calculate dCi
-    Ci1 = Cs
-    Ci2 = Ci_col
-    dCi = Ci1 - Ci2
+    dCi = Cs - Ci_col
 
     # Calculate dA
-    A1 = C.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
-    A2 = C.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
-    dA = A1 - A2
+    dA = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25) - \
+            C.calc_photosynthesis(Ci_col, Tleaf, PAR, Vcmax25)
 
     # Calculate dA/dCi
     dA_dci = dA / (dCi / press)
@@ -74,7 +71,6 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     # conductivity under low Ψpd and/or higher leaf-to-air vapour pressure.
     # Low xi = high hydraulic cost
     xi = 2.0 / ( (1.0 / K_pd) * dK_dpsi_leaf * rp * c.GSVGSC * dq)
-
 
     # Calculate gs at the colimitation point
     gs_col = (A2 * press / (Cs - Ci_col)) * c.GSVGSC
