@@ -54,9 +54,9 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     dA_dci = dA / (dCi / press)
 
     # Calculate dV/dLWP numerically
-    V1 = cavitation_func(psi_pd, p50, a_vuln)
+    V1 = calc_xylem_hydraulic_conduc(psi_pd, p50, a_vuln)
     psi_mid = (psi_pd + p50) / 2.0
-    V2 = cavitation_func(psi_mid, p50, a_vuln)
+    V2 = calc_xylem_hydraulic_conduc(psi_mid, p50, a_vuln)
     dV = V1 - V2
 
     dV_dLWP_V = (dV / (psi_pd - psi_mid)) * (1.0 / V1)
@@ -68,7 +68,7 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     # Calculate gs at the colimitation point
     gs_col = (A2 * press / (Cs - Ci_col)) * c.GSVGSC
 
-    # Calculate gs
+    # Calculate gs (mol H2O m-2 s-1)
     if dA_dci <= 0.0:
         gs = gs_col
     else:
@@ -82,10 +82,10 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     psi_leaf = psi_pd - (rp_min / V1) * E
 
     # Infer rp
-    V = cavitation_func( (psi_pd + psi_leaf) / 2.0, p50, a_vuln)
+    V = calc_xylem_hydraulic_conduc( (psi_pd + psi_leaf) / 2.0, p50, a_vuln)
     rp = rp_min / V
 
-    # Infer An
+    # Infer An (mol CO2 m-2 s-1)
     gc = gs / c.GSVGSC
     An = C.calc_photosynthesis_given_gc(Cs, Tleaf, PAR, Vcmax25, gc, press)
 
@@ -94,14 +94,18 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
 
     # Scale A and E up to the canopy using a big-leaf approximation
     GPP = An * (1.0 - np.exp(-k * LAI)) / k
+    GPP *= c.MOL_C_TO_GRAMS_C * c.SEC_TO_DAY
+
     E *= (1.0 - np.exp(-k * LAI)) / k
 
     return (gs, GPP, E, Ci, rp)
 
 
-def cavitation_func(psi, p50, a):
+def calc_xylem_hydraulic_conduc(psi, p50, a):
     """
-    Inverse polynomial function to describe cavitation-induced embolism
+    Calculate the normalised (0 to 1) xylem hydraulic conductance (K), computed
+    from the inverse polynomial function that describes cavitation-induced
+    embolism.
 
     Parameters:
     ----------
