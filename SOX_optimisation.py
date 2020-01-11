@@ -144,7 +144,7 @@ if __name__ == "__main__":
     p50 = -2.0       # xylem pressure inducing 50% loss of hydraulic
                      # conductivity due to embolism (MPa)
     a_vuln = 3.0     # shape of the vulnerability curve (unitless)
-    rp_min = 2000.   # minimum plant hydraulic resistance
+    rp_min = 2000.   # plant minimum hydraulic resistance
                      # (= 1/kmax; mol-1 m s MPa)
     dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
     LAI = 2.
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     p50 = -2.0       # xylem pressure inducing 50% loss of hydraulic
                      # conductivity due to embolism (MPa)
     a_vuln = 3.0     # shape of the vulnerability curve (unitless)
-    rp_min = 2000.   # minimum plant hydraulic resistance
+    rp_min = 2000.   # plant minimum hydraulic resistance
                      # (= 1/kmax; mol-1 m s MPa)
     dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
     LAI = 2.
