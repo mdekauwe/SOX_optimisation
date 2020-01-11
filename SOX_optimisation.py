@@ -81,7 +81,7 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     # Low xi = high hydraulic cost
     xi = 2.0 / ( (1.0 / K_pd) * dK_dpsi_leaf * rp * c.GSVGSC * dq)
 
-    # Calculate gs at the colimitation point
+    # Calculate gs at the co-limitation point
     gs_col = (A_col * press / (Cs - Ci_col)) * c.GSVGSC
 
     # Calculate gs (mol H2O m-2 s-1)
