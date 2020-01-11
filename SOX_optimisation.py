@@ -27,7 +27,7 @@ import pandas as pd
 
 from collatz_photosynthesis import CollatzC3
 
-def main(Vcmax25, Tleaf, Cs, PAR):
+def main(Vcmax25, Tleaf, Cs, PAR, press):
 
     Ci = Cs * 0.7
 
@@ -35,7 +35,18 @@ def main(Vcmax25, Tleaf, Cs, PAR):
 
     Ci_col = C.calc_ci_at_colimitation_point(Ci, Tleaf, PAR, Vcmax25)
 
-    print(Ci_col)
+    # Calculate dA/dCi
+    Ci1 = Cs
+    Ci2 = Ci_col
+    dCi = Ci1 - Ci2
+
+    A1 = C.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
+    A2 = C.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
+    dA = A1 - A2
+
+    dA_dci = dA / (dCi / press)
+
+    print(dA_dci)
 
 if __name__ == "__main__":
 
@@ -44,11 +55,13 @@ if __name__ == "__main__":
     #Tleaf = np.repeat(20, 100) # Leaf temp (deg C)
     #Ca = 36                    # leaf CO2 partial pressure (Pa)
     #PAR = np.repeat(0.002, 100) # photosyn active radiation (mol m-2 s-1)
+    #press = np.repeat(101325., 100) #  atmospheric pressure (Pa)
 
     #N  100
     Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
     Tleaf = 20.      # Leaf temp (deg C)
     Cs = 36.0        # leaf CO2 partial pressure (Pa)
     PAR = 0.002      # photosyn active radiation (mol m-2 s-1)
+    press = 101325.0 # atmospheric pressure (Pa)
 
-    main(Vcmax25, Tleaf, Cs, PAR)
+    main(Vcmax25, Tleaf, Cs, PAR, press)
