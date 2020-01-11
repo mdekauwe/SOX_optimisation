@@ -84,11 +84,13 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     # Calculate gs at the co-limitation point
     gs_col = (A_col * press / (Cs - Ci_col)) * c.GSVGSC
 
-    # Calculate gs (mol H2O m-2 s-1)
+    # Calculate gs (mol H2O m-2 s-1) using the analytical approximation for
+    # the optimal SOX gs using the partial derivatives of A with respect to Ci
+    # and K with respect to psi_m
     if dA_dci <= 0.0:
         gs = gs_col
     else:
-        gs = (0.5 * dA_dci * (np.sqrt(1.0 + 4.0 * xi / dA_dci) - 1.0))
+        gs = 0.5 * dA_dci * (np.sqrt(4.0 * xi / dA_dci + 1) - 1.0)
         gs *= c.GSVGSC
 
     # Infer transpiration, assuming perfect coupling (mol H2O m-2 leaf s-1)
