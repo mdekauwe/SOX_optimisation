@@ -100,14 +100,7 @@ def cavitation_func(P, P50, a):
 
 if __name__ == "__main__":
 
-    #N = 100
-    #Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
-    #Tleaf = np.repeat(20, 100) # Leaf temp (deg C)
-    #Ca = 36                    # leaf CO2 partial pressure (Pa)
-    #PAR = np.repeat(0.002, 100) # photosyn active radiation (mol m-2 s-1)
-    #press = np.repeat(101325., 100) #  atmospheric pressure (Pa)
-
-    #N  100
+    """
     Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
     Tleaf = 20.      # Leaf temp (deg C)
     Cs = 36.0        # leaf CO2 partial pressure (Pa)
@@ -124,5 +117,30 @@ if __name__ == "__main__":
     (gs, GPP, E, Ci, rp) = sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press,
                                             psi_pd, p50, a_vuln, rp_min, dq,
                                             LAI)
+    """
 
-    print(gs, GPP, E, Ci, rp)
+    Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
+    Tleaf = 20.0 # Leaf temp (deg C)
+    Cs = np.arange(1, 81) # leaf CO2 partial pressure (Pa)
+    PAR = 0.002 # photosyn active radiation (mol m-2 s-1)
+    press = 101325.0 # atmospheric pressure (Pa)
+    psi_pd = -0.1    # pre-dawn soil water potential (MPa)
+    p50 = -2.0       # xylem pressure inducing 50% loss of hydraulic
+                     # conductivity due to embolism (MPa)
+    a_vuln = 3.0     # shape of the vulnerability curve (unitless)
+    rp_min = 2000.   # minimum plant hydraulic resistance
+                     # (= 1/kmax; mol-1 m s MPa)
+    dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
+    LAI = 2.
+
+    gs_store = []
+
+    for i in range(80):
+
+        (gs, GPP, E, Ci, rp) = sox_optimisation(Vcmax25, Tleaf, Cs[i], PAR,
+                                                press, psi_pd, p50, a_vuln,
+                                                rp_min, dq, LAI)
+        gs_store.append(gs)
+
+    plt.plot(Cs, gs_store)
+    plt.show()
