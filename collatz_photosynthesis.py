@@ -86,14 +86,16 @@ class CollatzC3(object):
 
 
     def Q10_func(self, k25, Q10, Tleaf):
-        """ Q10 function to calculate parameter change with temperature """
-
+        """
+        Q10 function to calculate parameter change with temperature
+        """
+        
         return k25 * (Q10**((Tleaf - 25.0) / 10.0))
 
     def correct_vcmax_for_temperature(self, Vcmax25, Tleaf):
         """
         Correct Vcmax based on defined by PFT-specific upper and lower
-        temperature params, see Clark et al.
+        temperature params, see Clark et al. (mol CO2 m-2 s-1)
         """
         num = self.Q10_func(Vcmax25, self.Q10, Tleaf)
         den = (1.0 + math.exp(0.3 * (Tleaf - self.Tupper))) * \
