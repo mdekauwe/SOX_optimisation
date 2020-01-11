@@ -36,16 +36,16 @@ import constants as c
 def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
                      rp_min, dq, LAI, k=0.5):
 
-    COL = CollatzC3()
-    Ci_col = COL.calc_ci_at_colimitation_point(Cs, Tleaf, PAR, Vcmax25)
+    C = CollatzC3()
+    Ci_col = C.calc_ci_at_colimitation_point(Cs, Tleaf, PAR, Vcmax25)
 
     # Calculate dA/dCi
     Ci1 = Cs
     Ci2 = Ci_col
     dCi = Ci1 - Ci2
 
-    A1 = COL.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
-    A2 = COL.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
+    A1 = C.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
+    A2 = C.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
     dA = A1 - A2
 
     dA_dci = dA / (dCi / press)
@@ -84,7 +84,7 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
 
     # Infer An
     gc = gs / c.GSVGSC
-    An = COL.calc_photosynthesis_given_gc(Cs, Tleaf, PAR, Vcmax25, gc, press)
+    An = C.calc_photosynthesis_given_gc(Cs, Tleaf, PAR, Vcmax25, gc, press)
 
     # Diagnose Ci
     Ci = Cs - (An * press) / gc
