@@ -39,9 +39,10 @@ class CollatzC3(object):
     # that is a mistake
     def __init__(self, Oa=21000.0, gamstar25=42.75, Kc25=30.0, Ko25=30.0*1E3,
                  Q10_Kc=2.1, Q10_Ko=1.2, Q10_Vcmax=2.0, Tlower=10.0,
-                 Tupper=50.0, gamma25=2600.0, Q10_gamma=0.57):
+                 Tupper=50.0, gamma25=2600.0, Q10_gamma=0.57, alpha=0.08,
+                 omega=0.15):
 
-        self.gamma25 = gamma25 #
+        self.gamma25 = gamma25 # coefficents for CO2 compensation point (Pa)
         self.Kc25 = Kc25 # MM coefficents for carboxylation by Rubisco (Pa)
         self.Ko25 = Ko25 # MM coefficents for oxygenation by Rubisco (Pa)
         self.Q10_Ko = Q10_Ko # Q10 value for MM constants for O2
@@ -52,6 +53,10 @@ class CollatzC3(object):
         self.Tlower = Tlower # Lower temperature for carboxylation
         self.Tupper = Tupper # Upper temperature for carboxylation
         self.Oa = Oa # the partial pressure of atmospheric oxygen (Pa)
+        self.alpha = alpha # quantum efficiency of
+                           # photosynthesis (mol CO2 mol-1 PAR)
+        self.omega = omega #  leaf scattering coefficent for PAR (unitless)
+
 
     def calc_photosynthesis(self, Ci=None, Tleaf=None, Par=None, Vcmax25=None):
         """
@@ -81,11 +86,18 @@ class CollatzC3(object):
         # Leaf day respiration (mol m-2 s-1)
         Rd = Vcmax * 0.01
 
-        # Leaf-level photosynthesi: Rubisco-limited rate (Pa)
+        # Leaf-level photosynthesis: Rubisco-limited rate (Pa)
         Ac = Vcmax * ((Ci - gamma) / (Ci + Km))
 
+        # Leaf-level photosynthesis: Light-limited rate (Pa)
+        Al = self.alpha * (1.0 - self.omega) * PAR \
+                * ((Ci - gamma) / (Ci + 2.0 * gamma))
 
-        print(Ac)
+        # Leaf-level photosynthesis: rate of transport of photosynthetic
+        # products
+        Ae = 0.5 * Vcmax
+
+        print(Ac, Al, Ae)
 
     def calc_michaelis_menten_constants(self, Tleaf):
         """
