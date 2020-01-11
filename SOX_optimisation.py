@@ -25,10 +25,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def main():
-    pass
+from collatz_photosynthesis import CollatzC3
 
+def main(Vcmax25, Tleaf, Cs, PAR):
+
+    Ci = Cs * 0.7
+
+    C = CollatzC3()
+    An = C.calc_photosynthesis(Ci, Tleaf, PAR, Vcmax25)
+
+    print(An)
 
 if __name__ == "__main__":
 
-    main()
+    Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
+    Tleaf = 35.0     # Leaf temp (deg C)
+    Cs = 40.0       # leaf CO2 partial pressure (Pa)
+    PAR = 0.002      # photosynthetically active radiation (mol m-2 s-1)
+
+    main(Vcmax25, Tleaf, Cs, PAR)

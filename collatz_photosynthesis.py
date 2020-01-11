@@ -59,7 +59,7 @@ class CollatzC3(object):
         self.beta1 = beta1 # smoothing co-limitation coefficient
         self.beta2 = beta2 # smoothing co-limitation coefficient
 
-    def calc_photosynthesis(self, Ci=None, Tleaf=None, Par=None, Vcmax25=None):
+    def calc_photosynthesis(self, Ci, Tleaf, PAR, Vcmax25):
         """
         Parameters
         ----------
@@ -219,16 +219,12 @@ class CollatzC3(object):
 
 if __name__ == "__main__":
 
-    # Maximum rate of rubisco activity 25C (mol m-2 s-1)
-    Vcmax25 = 0.0001 #
-    Tleaf = 35.0
-
-    Cs = 400.0
-
-    # photosynthetically active radiation (mol m-2 s-1)
-    PAR = 0.002
+    Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
+    Tleaf = 35.0     # Leaf temp (deg C)
+    Ci = 40. * 0.7  # leaf interceullular partial pressure (Pa)
+    PAR = 0.002      # photosynthetically active radiation (mol m-2 s-1)
 
     C = CollatzC3()
-    An = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
+    An = C.calc_photosynthesis(Ci, Tleaf, PAR, Vcmax25)
 
     print(An)
