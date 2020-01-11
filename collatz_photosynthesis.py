@@ -74,9 +74,7 @@ class CollatzC3(object):
         Tk = Tleaf + c.DEG_2_KELVIN
 
         # Max rate of rubisco activity (mol m-2 s-1)
-        Vcmax = (Vcmax25 * (self.Q10**(0.1 * (Tleaf - 25.0))) /
-                            ((1.0 + math.exp(0.3 * (Tleaf - self.Tupper))) *
-                            (1.0 + math.exp(0.3 * (self.Tlower - Tleaf)))))
+        Vcmax = self.correct_vcmax_for_temperature(Vcmax25, Tleaf)
 
         # Michaelis Menten constants for CO2 (Pa)
         Kc = self.Q10_func(self.Kc25, self.Q10_Kc, Tleaf)
@@ -92,63 +90,16 @@ class CollatzC3(object):
 
         return k25 * (Q10**((Tleaf - 25.0) / 10.0))
 
-
-    def peaked_arrh(self, k25, Ea, Tk, deltaS, Hd):
-        """ Temperature dependancy approximated by peaked Arrhenius eqn,
-        accounting for the rate of inhibition at higher temperatures.
-
-        Parameters:
-        ----------
-        k25 : float
-            rate parameter value at 25 degC or 298 K
-        Ea : float
-            activation energy for the parameter [J mol-1]
-        Tk : float
-            leaf temperature [deg K]
-        deltaS : float
-            entropy factor [J mol-1 K-1)
-        Hd : float
-            describes rate of decrease about the optimum temp [J mol-1]
-
-        Returns:
-        -------
-        kt : float
-            temperature dependence on parameter
-
-        References:
-        -----------
-        * Medlyn et al. 2002, PCE, 25, 1167-1179.
-
+    def correct_vcmax_for_temperature(self, Vcmax25, Tleaf):
         """
-        arg1 = self.arrh(k25, Ea, Tk)
-        arg2 = 1.0 + np.exp((298.15 * deltaS - Hd) / (298.15 * c.RGAS))
-        arg3 = 1.0 + np.exp((Tk * deltaS - Hd) / (Tk * c.RGAS))
-
-        return arg1 * arg2 / arg3
-
-    def arrh(self, k25, Ea, Tk):
-        """ Temperature dependence of kinetic parameters is described by an
-        Arrhenius function.
-
-        Parameters:
-        ----------
-        k25 : float
-            rate parameter value at 25 degC or 298 K
-        Ea : float
-            activation energy for the parameter [J mol-1]
-        Tk : float
-            leaf temperature [deg K]
-
-        Returns:
-        -------
-        kt : float
-            temperature dependence on parameter
-
-        References:
-        -----------
-        * Medlyn et al. 2002, PCE, 25, 1167-1179.
+        Correct Vcmax based on defined by PFT-specific upper and lower
+        temperature params, see Clark et al.
         """
-        return k25 * np.exp((Ea * (Tk - 298.15)) / (298.15 * c.RGAS * Tk))
+        num = self.Q10_func(Vcmax25, self.Q10, Tleaf)
+        den = (1.0 + math.exp(0.3 * (Tleaf - self.Tupper))) * \
+                (1.0 + math.exp(0.3 * (self.Tlower - Tleaf)))
+
+        return num / den
 
 
 if __name__ == "__main__":
