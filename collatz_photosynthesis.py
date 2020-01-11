@@ -40,7 +40,7 @@ class CollatzC3(object):
     def __init__(self, Oa=21000.0, gamstar25=42.75, Kc25=30.0, Ko25=30.0*1E3,
                  Q10_Kc=2.1, Q10_Ko=1.2, Q10_Vcmax=2.0, Tlower=10.0,
                  Tupper=50.0, gamma25=2600.0, Q10_gamma=0.57, alpha=0.08,
-                 omega=0.15):
+                 omega=0.15, beta1=0.999, beta2=0.999):
 
         self.gamma25 = gamma25 # coefficents for CO2 compensation point (Pa)
         self.Kc25 = Kc25 # MM coefficents for carboxylation by Rubisco (Pa)
@@ -56,7 +56,8 @@ class CollatzC3(object):
         self.alpha = alpha # quantum efficiency of
                            # photosynthesis (mol CO2 mol-1 PAR)
         self.omega = omega #  leaf scattering coefficent for PAR (unitless)
-
+        self.beta1 = beta1 # smoothing co-limitation coefficient
+        self.beta2 = beta2 # smoothing co-limitation coefficient
 
     def calc_photosynthesis(self, Ci=None, Tleaf=None, Par=None, Vcmax25=None):
         """
@@ -97,7 +98,25 @@ class CollatzC3(object):
         # products
         Ae = 0.5 * Vcmax
 
-        print(Ac, Al, Ae)
+        # The rate of gross photosynthesis (W) is calculated as the smoothed
+        # minimum of three potentially-limiting rates
+        A = self.beta1
+        B = -(Ac + Al)
+        C = Ac * Al
+        A_gross1 = self.quadratic(a=A, b=B, c=C, large=False)
+
+        A = self.beta2
+        B = -(A_gross1 + Ae)
+        C = A_gross1 *Ae
+        A_gross2 = self.quadratic(a=A, b=B, c=C, large=False)
+
+        # Rate of gross photosynthesis (mol CO2 m-2 s-1)
+        Ag = A_gross2
+
+        # Rate of net photosynthesis (mol CO2 m-2 s-1)
+        An = Ag - Rd
+
+        return An
 
     def calc_michaelis_menten_constants(self, Tleaf):
         """
@@ -152,6 +171,51 @@ class CollatzC3(object):
 
         return num / den
 
+    def quadratic(self, a=None, b=None, c=None, large=False):
+        """ minimilist quadratic solution as root for J solution should always
+        be positive, so I have excluded other quadratic solution steps. I am
+        only returning the smallest of the two roots
+
+        Parameters:
+        ----------
+        a : float
+            co-efficient
+        b : float
+            co-efficient
+        c : float
+            co-efficient
+
+        Returns:
+        -------
+        val : float
+            positive root
+        """
+        d = b**2.0 - 4.0 * a * c # discriminant
+        if d < 0.0:
+            raise ValueError('imaginary root found')
+        #root1 = np.where(d>0.0, (-b - np.sqrt(d)) / (2.0 * a), d)
+        #root2 = np.where(d>0.0, (-b + np.sqrt(d)) / (2.0 * a), d)
+
+        if large:
+            if math.isclose(a, 0.0) and b > 0.0:
+                root = -c / b
+            elif math.isclose(a, 0.0) and math.isclose(b, 0.0):
+                root = 0.0
+                if c != 0.0:
+                    raise ValueError('Cant solve quadratic')
+            else:
+                root = (-b + np.sqrt(d)) / (2.0 * a)
+        else:
+            if math.isclose(a, 0.0) and b > 0.0:
+                root = -c / b
+            elif math.isclose(a, 0.0) and math.isclose(b, 0.0):
+                root == 0.0
+                if c != 0.0:
+                    raise ValueError('Cant solve quadratic')
+            else:
+                root = (-b - np.sqrt(d)) / (2.0 * a)
+
+        return root
 
 if __name__ == "__main__":
 
@@ -165,4 +229,6 @@ if __name__ == "__main__":
     PAR = 0.002
 
     C = CollatzC3()
-    C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
+    An = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
+
+    print(An)
