@@ -32,15 +32,23 @@ def main(Vcmax25, Tleaf, Cs, PAR):
     Ci = Cs * 0.7
 
     C = CollatzC3()
-    An = C.calc_photosynthesis(Ci, Tleaf, PAR, Vcmax25)
+    
+    Ci_col = C.calc_ci_at_colimitation_point(Ci, Tleaf, PAR, Vcmax25)
 
-    print(An)
+    print(Ci_col)
 
 if __name__ == "__main__":
 
+    #N = 100
+    #Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
+    #Tleaf = np.repeat(20, 100) # Leaf temp (deg C)
+    #Ca = 36                    # leaf CO2 partial pressure (Pa)
+    #PAR = np.repeat(0.002, 100) # photosyn active radiation (mol m-2 s-1)
+
+    #N  100
     Vcmax25 = 0.0001 # Maximum rate of rubisco activity 25C (mol m-2 s-1)
-    Tleaf = 35.0     # Leaf temp (deg C)
-    Cs = 40.0       # leaf CO2 partial pressure (Pa)
-    PAR = 0.002      # photosynthetically active radiation (mol m-2 s-1)
+    Tleaf = 20.      # Leaf temp (deg C)
+    Cs = 36.0        # leaf CO2 partial pressure (Pa)
+    PAR = 0.002      # photosyn active radiation (mol m-2 s-1)
 
     main(Vcmax25, Tleaf, Cs, PAR)

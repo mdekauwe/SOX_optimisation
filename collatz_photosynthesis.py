@@ -61,6 +61,7 @@ class CollatzC3(object):
 
     def calc_photosynthesis(self, Ci, Tleaf, PAR, Vcmax25):
         """
+
         Parameters
         ----------
         Ci : float
@@ -118,7 +119,58 @@ class CollatzC3(object):
 
         return An
 
-    def calc_michaelis_menten_constants(self, Tleaf):
+    def calc_ci_at_colimitation_point(self, Ci, Tleaf, PAR, Vcmax25):
+        """
+
+        Parameters
+        ----------
+        Ci : float
+            leaf intercellular CO2 partial pressure (Pa)
+        Tleaf : float
+            leaf temp (deg C)
+        PAR : float
+            photosynthetically active radiation (mol m-2 s-1)
+        Vcmax25 : float
+            Maximum rate of rubisco activity 25C (mol m-2 s-1)
+
+        """
+        Tk = Tleaf + c.DEG_2_KELVIN
+
+        # CO2 compensation point in the absence of mitochondrial resp (Pa)
+        gamma = self.calc_CO2_compensation_point(Tleaf)
+
+        # calculate temp depend of Michaelis Menten constants for CO2, O2
+        Km, Ko, Kc = self.calc_michaelis_menten_constants(Tleaf, ret_cnts=True)
+
+        # Max rate of rubisco activity (mol m-2 s-1)
+        Vcmax = self.correct_vcmax_for_temperature(Vcmax25, Tleaf)
+
+        # Leaf day respiration (mol m-2 s-1)
+        Rd = Vcmax * 0.01
+
+        # Leaf-level photosynthesis: Light-limited rate (Pa)
+        Al = self.alpha * (1.0 - self.omega) * PAR
+
+        # Leaf-level photosynthesis: rate of transport of photosynthetic
+        # products
+        Ae = 0.5 * Vcmax
+
+        # Co-limitated A
+        A = self.beta2
+        B = -(Al + Ae)
+        C = Al * Ae
+        A_colimit = self.quadratic(a=A, b=B, c=C, large=False)
+
+        # Ci at the colimitation point
+        a_bnd = -Vcmax * gamma
+        b_bnd = Vcmax
+        d_bnd = Kc * (1.0 + self.Oa / Ko)
+        e_bnd = 1.0
+        Ci_col = (a_bnd - d_bnd * A_colimit) / (e_bnd * A_colimit - b_bnd)
+
+        return Ci_col
+
+    def calc_michaelis_menten_constants(self, Tleaf, ret_cnts=False):
         """
         Michaelis-Menten constant for O2/CO2, Arrhenius temp dependancy
 
@@ -140,7 +192,10 @@ class CollatzC3(object):
 
         Km = Kc * (1.0 + self.Oa / Ko)
 
-        return Km
+        if ret_cnts:
+            return Km, Ko, Kc
+        else:
+            return Km
 
     def calc_CO2_compensation_point(self, Tleaf):
         """
