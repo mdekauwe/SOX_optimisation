@@ -15,7 +15,7 @@ import sys
 import numpy as np
 import os
 import math
-import constants as c
+import constants as cnt
 
 class CollatzC3(object):
 
@@ -74,7 +74,7 @@ class CollatzC3(object):
             Maximum rate of rubisco activity 25C (mol m-2 s-1)
 
         """
-        Tk = Tleaf + c.DEG_2_KELVIN
+        Tk = Tleaf + cnt.DEG_2_KELVIN
 
         # CO2 compensation point in the absence of mitochondrial resp (Pa)
         gamma = self.calc_CO2_compensation_point(Tleaf)
@@ -108,7 +108,80 @@ class CollatzC3(object):
 
         A = self.beta2
         B = -(A_gross1 + Ae)
-        C = A_gross1 *Ae
+        C = A_gross1 * Ae
+        A_gross2 = self.quadratic(a=A, b=B, c=C, large=False)
+
+        # Rate of gross photosynthesis (mol CO2 m-2 s-1)
+        Ag = A_gross2
+
+        # Rate of net photosynthesis (mol CO2 m-2 s-1)
+        An = Ag - Rd
+
+        return An
+
+    def calc_photosynthesis_given_gc(self, Cs, Tleaf, PAR, Vcmax25, gc, press):
+        """
+
+        Parameters
+        ----------
+        Cs : float
+            leaf CO2 partial pressure (Pa)
+        Tleaf : float
+            leaf temp (deg C)
+        PAR : float
+            photosynthetically active radiation (mol m-2 s-1)
+        Vcmax25 : float
+            Maximum rate of rubisco activity 25C (mol m-2 s-1)
+        gc : float
+            stomatal conductance to CO2
+        press: float
+            atmospheric pressure (Pa)
+        """
+        Tk = Tleaf + cnt.DEG_2_KELVIN
+
+        # CO2 compensation point in the absence of mitochondrial resp (Pa)
+        gamma = self.calc_CO2_compensation_point(Tleaf)
+
+        # calculate temp depend of Michaelis Menten constants for CO2, O2
+        Km, Ko, Kc = self.calc_michaelis_menten_constants(Tleaf, ret_cnts=True)
+
+        # Max rate of rubisco activity (mol m-2 s-1)
+        Vcmax = self.correct_vcmax_for_temperature(Vcmax25, Tleaf)
+
+        # Leaf day respiration (mol m-2 s-1)
+        Rd = Vcmax * 0.01
+
+        # Leaf-level photosynthesis: Rubisco-limited rate (Pa)
+        a = Vcmax
+        b = Kc * (1.0 + self.Oa / Ko)
+        c = (Rd - a) - (gc / press) * (Cs + b)
+        d = (gc / press) * (a * Cs - a * gamma - Rd * Cs - b * Rd)
+        Ac = (-(c / 2.0) - math.sqrt(((c / 2.0)**2) - d)) + Rd
+
+        # Leaf-level photosynthesis: Light-limited rate (Pa)
+        a = self.alpha * (1.0 - self.omega) * PAR
+        b = 2.0 * gamma
+        c = (Rd - a) - (gc / press) * (Cs + b)
+        #d = (gc/Pa)*(a * Ca - a * photocomp - Rd * Ca - b*Rd)
+        d = (gc / press) * (a * Cs - a * gamma - Rd * Cs - b * Rd)
+        Al = (-(c / 2.0) - math.sqrt(((c / 2.0)**2.0) - d)) + Rd
+
+        # Leaf-level photosynthesis: rate of transport of photosynthetic
+        # products
+        Ae = 0.5 * Vcmax
+
+        # Co-limitation
+
+        # The rate of gross photosynthesis (W) is calculated as the smoothed
+        # minimum of three potentially-limiting rates
+        A = self.beta1
+        B = -(Ac + Al)
+        C = Ac * Al
+        A_gross1 = self.quadratic(a=A, b=B, c=C, large=False)
+
+        A = self.beta2
+        B = -(A_gross1 + Ae)
+        C = A_gross1 * Ae
         A_gross2 = self.quadratic(a=A, b=B, c=C, large=False)
 
         # Rate of gross photosynthesis (mol CO2 m-2 s-1)
@@ -134,7 +207,7 @@ class CollatzC3(object):
             Maximum rate of rubisco activity 25C (mol m-2 s-1)
 
         """
-        Tk = Tleaf + c.DEG_2_KELVIN
+        Tk = Tleaf + cnt.DEG_2_KELVIN
 
         # CO2 compensation point in the absence of mitochondrial resp (Pa)
         gamma = self.calc_CO2_compensation_point(Tleaf)

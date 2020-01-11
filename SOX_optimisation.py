@@ -28,21 +28,22 @@ import pandas as pd
 from collatz_photosynthesis import CollatzC3
 import constants as c
 
-def main(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln, rp_min, dq):
+def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
+                     rp_min, dq, LAI, k=0.5):
 
     Ci = Cs * 0.7
 
-    C = CollatzC3()
+    COL = CollatzC3()
 
-    Ci_col = C.calc_ci_at_colimitation_point(Ci, Tleaf, PAR, Vcmax25)
+    Ci_col = COL.calc_ci_at_colimitation_point(Ci, Tleaf, PAR, Vcmax25)
 
     # Calculate dA/dCi
     Ci1 = Cs
     Ci2 = Ci_col
     dCi = Ci1 - Ci2
 
-    A1 = C.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
-    A2 = C.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
+    A1 = COL.calc_photosynthesis(Ci1, Tleaf, PAR, Vcmax25)
+    A2 = COL.calc_photosynthesis(Ci2, Tleaf, PAR, Vcmax25)
     dA = A1 - A2
 
     dA_dci = dA / (dCi / press)
@@ -59,7 +60,39 @@ def main(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln, rp_min, dq):
     rp_d = c.GSVGSC * (rp_min / V1) * dq / 2.0
     xi = 1.0 / (rp_d * dV_dLWP_V)
 
-    print(xi)
+    # Calculate gs at the colimitation point
+    gs_col = (A2 * press / (Cs - Ci_col)) * c.GSVGSC
+
+    # Calculate gs
+    if dA_dci <= 0.0:
+        gs = gs_col
+    else:
+        gs = (0.5 * dA_dci * (np.sqrt(1.0 + 4.0 * xi / dA_dci) - 1.0))
+        gs *= c.GSVGSC
+
+    # Infer transpiration, assuming perfect coupling
+    E = dq * gs
+
+    # Infer psi_leaf
+    psi_leaf = psi_pd - (rp_min / V1) * E
+
+    # Infer rp
+    V = cavitation_func( (psi_pd + psi_leaf) / 2.0, p50, a_vuln)
+    rp = rp_min / V
+
+    # Infer An
+    gc = gs / c.GSVGSC
+    An = COL.calc_photosynthesis_given_gc(Cs, Tleaf, PAR, Vcmax25, gc, press)
+
+    # Diagnose Ci
+    Ci = Cs - (An * press) / gc
+
+    # Scale A and E up to the canopy using a big-leaf approximation
+    GPP = An * (1.0 - np.exp(-k * LAI)) / k
+    E *= (1.0 - np.exp(-k * LAI)) / k
+
+    return (gs, GPP, E, Ci, rp)
+
 
 def cavitation_func(P, P50, a):
     return 1.0 / (1.0 + (P / P50)**a)
@@ -87,4 +120,9 @@ if __name__ == "__main__":
     rp_min = 2000.   # minimum plant hydraulic resistance
                      # (= 1/kmax; mol-1 m s MPa)
     dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
-    main(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln, rp_min, dq)
+    LAI = 2.
+    (gs, GPP, E, Ci, rp) = sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press,
+                                            psi_pd, p50, a_vuln, rp_min, dq,
+                                            LAI)
+
+    print(gs, GPP, E, Ci, rp)
