@@ -50,7 +50,7 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     dCi = Cs - Ci_col
 
     # Calculate dA
-    A_Cs = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
+    A_Cs = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25) # Ambient leaf CO2
     A_col = C.calc_photosynthesis(Ci_col, Tleaf, PAR, Vcmax25) # co-limit point
     dA = A_Cs - A_col
 
