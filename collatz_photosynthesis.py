@@ -69,8 +69,8 @@ class CollatzC3(object):
         """
         Tk = Tleaf + c.DEG_2_KELVIN
 
-        # Max rate of rubisco activity (mol m-2 s-1)
-        Vcmax = self.correct_vcmax_for_temperature(Vcmax25, Tleaf)
+        # CO2 compensation point in the absence of mitochondrial resp (Pa)
+        gamma = self.calc_CO2_compensation_point(Tleaf)
 
         # Michaelis Menten constants for CO2 (Pa)
         Kc = self.Q10_func(self.Kc25, self.Q10_Kc, Tleaf)
@@ -78,10 +78,13 @@ class CollatzC3(object):
         # Michaelis Menten constants for O2 (Pa)
         Ko = self.Q10_func(self.Ko25, self.Q10_Ko, Tleaf)
 
-        # CO2 compensation point in the absence of mitochondrial resp (Pa)
-        gamma = self.calc_CO2_compensation_point(Tleaf)
+        # Max rate of rubisco activity (mol m-2 s-1)
+        Vcmax = self.correct_vcmax_for_temperature(Vcmax25, Tleaf)
 
-        print(Vcmax, Kc, Ko, gamma)
+        # Leaf day respiration (mol m-2 s-1)
+        Rd = Vcmax * 0.01
+
+        print(Vcmax, Rd, Kc, Ko, gamma)
 
 
     def calc_CO2_compensation_point(self, Tleaf):
