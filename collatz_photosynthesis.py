@@ -53,7 +53,7 @@ class CollatzC3(object):
         self.Hdv = Hdv
         self.Q10_Ko = Q10_Ko
         self.Q10_Kc = Q10_Kc
-        self.Q10_vcmax = Q10_Vcmax # Q10 value for carboxylation of Rubisco
+        self.Q10_Vcmax = Q10_Vcmax # Q10 value for carboxylation of Rubisco
         self.Tlower = Tlower # Lower temperature for carboxylation
         self.Tupper = Tupper # Upper temperature for carboxylation
 
