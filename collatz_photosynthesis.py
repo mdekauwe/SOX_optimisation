@@ -53,12 +53,12 @@ class CollatzC3(object):
         self.Tupper = Tupper # Upper temperature for carboxylation
         self.Oa = Oa # the partial pressure of atmospheric oxygen (Pa)
 
-    def calc_photosynthesis(self, Cs=None, Tleaf=None, Par=None, Vcmax25=None):
+    def calc_photosynthesis(self, Ci=None, Tleaf=None, Par=None, Vcmax25=None):
         """
         Parameters
         ----------
-        Cs : float
-            leaf surface CO2 concentration (mol mol-1)
+        Ci : float
+            leaf intercellular CO2 partial pressure (Pa)
         Tleaf : float
             leaf temp (deg C)
         PAR : float
@@ -72,11 +72,8 @@ class CollatzC3(object):
         # CO2 compensation point in the absence of mitochondrial resp (Pa)
         gamma = self.calc_CO2_compensation_point(Tleaf)
 
-        # Michaelis Menten constants for CO2 (Pa)
-        Kc = self.Q10_func(self.Kc25, self.Q10_Kc, Tleaf)
-
-        # Michaelis Menten constants for O2 (Pa)
-        Ko = self.Q10_func(self.Ko25, self.Q10_Ko, Tleaf)
+        # calculate temp depend of Michaelis Menten constants for CO2, O2
+        Km = self.calc_michaelis_menten_constants(Tleaf)
 
         # Max rate of rubisco activity (mol m-2 s-1)
         Vcmax = self.correct_vcmax_for_temperature(Vcmax25, Tleaf)
@@ -84,8 +81,35 @@ class CollatzC3(object):
         # Leaf day respiration (mol m-2 s-1)
         Rd = Vcmax * 0.01
 
-        print(Vcmax, Rd, Kc, Ko, gamma)
+        # Leaf-level photosynthesi: Rubisco-limited rate (Pa)
+        Ac = Vcmax * ((Ci - gamma) / (Ci + Km))
 
+
+        print(Ac)
+
+    def calc_michaelis_menten_constants(self, Tleaf):
+        """
+        Michaelis-Menten constant for O2/CO2, Arrhenius temp dependancy
+
+        Parameters:
+        ----------
+        Tleaf : float
+            leaf temperature [deg K]
+
+        Returns:
+        ----------
+        Km : float
+            Michaelis-Menten constant
+        """
+        # Michaelis Menten constants for CO2 (Pa)
+        Kc = self.Q10_func(self.Kc25, self.Q10_Kc, Tleaf)
+
+        # Michaelis Menten constants for O2 (Pa)
+        Ko = self.Q10_func(self.Ko25, self.Q10_Ko, Tleaf)
+
+        Km = Kc * (1.0 + self.Oa / Ko)
+
+        return Km
 
     def calc_CO2_compensation_point(self, Tleaf):
         """
