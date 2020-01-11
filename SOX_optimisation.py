@@ -26,8 +26,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from collatz_photosynthesis import CollatzC3
+import constants as c
 
-def main(Vcmax25, Tleaf, Cs, PAR, press):
+def main(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln, rp_min, dq):
 
     Ci = Cs * 0.7
 
@@ -46,7 +47,23 @@ def main(Vcmax25, Tleaf, Cs, PAR, press):
 
     dA_dci = dA / (dCi / press)
 
-    print(dA_dci)
+    # Calculate dV/dLWP numerically
+    V1 = cavitation_func(psi_pd, p50, a_vuln)
+    psi_mid = (psi_pd + p50) / 2.0
+    V2 = cavitation_func(psi_mid, p50, a_vuln)
+    dV = V1 - V2
+
+    dV_dLWP_V = (dV / (psi_pd - psi_mid)) * (1.0 / V1)
+
+    # Calculate xi
+    rp_d = c.GSVGSC * (rp_min / V1) * dq / 2.0
+    xi = 1.0 / (rp_d * dV_dLWP_V)
+
+    print(xi)
+
+def cavitation_func(P, P50, a):
+    return 1.0 / (1.0 + (P / P50)**a)
+
 
 if __name__ == "__main__":
 
@@ -63,5 +80,11 @@ if __name__ == "__main__":
     Cs = 36.0        # leaf CO2 partial pressure (Pa)
     PAR = 0.002      # photosyn active radiation (mol m-2 s-1)
     press = 101325.0 # atmospheric pressure (Pa)
-
-    main(Vcmax25, Tleaf, Cs, PAR, press)
+    psi_pd = -0.1    # pre-dawn soil water potential (MPa)
+    p50 = -2.0       # xylem pressure inducing 50% loss of hydraulic
+                     # conductivity due to embolism (MPa)
+    a_vuln = 3.0     # shape of the vulnerability curve (unitless)
+    rp_min = 2000.   # minimum plant hydraulic resistance
+                     # (= 1/kmax; mol-1 m s MPa)
+    dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
+    main(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln, rp_min, dq)
