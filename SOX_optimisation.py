@@ -46,8 +46,9 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     dCi = Cs - Ci_col
 
     # Calculate dA
-    dA = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25) - \
-            C.calc_photosynthesis(Ci_col, Tleaf, PAR, Vcmax25)
+    A1 = C.calc_photosynthesis(Cs, Tleaf, PAR, Vcmax25)
+    A2 = C.calc_photosynthesis(Ci_col, Tleaf, PAR, Vcmax25)
+    dA = A1 - A2
 
     # Calculate dA/dCi
     dA_dci = dA / (dCi / press)
