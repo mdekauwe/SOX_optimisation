@@ -145,7 +145,7 @@ if __name__ == "__main__":
                      # conductivity due to embolism (MPa)
     a_vuln = 3.0     # shape of the vulnerability curve (unitless)
     rp_min = 2000.   # plant minimum hydraulic resistance
-                     # (= 1/kmax; mol-1 m s MPa)
+                     # (= 1/kmax; m2 s MPa mol-1 H2O)
     dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
     LAI = 2.
     (gs, GPP, E, Ci, rp) = sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press,
@@ -163,7 +163,7 @@ if __name__ == "__main__":
                      # conductivity due to embolism (MPa)
     a_vuln = 3.0     # shape of the vulnerability curve (unitless)
     rp_min = 2000.   # plant minimum hydraulic resistance
-                     # (= 1/kmax; mol-1 m s MPa)
+                     # (= 1/kmax; m2 s MPa mol-1 H2O)
     dq = 0.02474747  # Leaf to air vapor pressure deficit (unitless)
     LAI = 2.
 
