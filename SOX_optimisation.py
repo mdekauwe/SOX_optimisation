@@ -102,7 +102,7 @@ def sox_optimisation(Vcmax25, Tleaf, Cs, PAR, press, psi_pd, p50, a_vuln,
     An = C.calc_photosynthesis_given_gc(Cs, Tleaf, PAR, Vcmax25, gc, press)
 
     # Diagnose Ci  (Pa)
-    Ci = Cs - (An * press) / gc
+    Ci = Cs - An / (gc / press)
 
     # Scale A (g C m-2 d-1) and E (mm d-1) up to the canopy using a
     # big-leaf approximation
